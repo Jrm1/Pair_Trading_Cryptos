@@ -14,43 +14,6 @@ import seaborn as sns
 import statsmodels.api as sm
 from statsmodels.tsa.stattools import coint
 
-NC=2
-
-#Read the list of names 
-List = pd.read_csv('100List.csv')
-List = List.drop(['#','Market Cap', 'Price','Circulating Supply','Volume (24h)','% Change (24h)'], axis = 1)
-
-currencies=[]
-for i in range(0,NC):
-    currencies.append(pd.read_csv( str(List['Name'][i])+'.csv'))
-
-    currencies[i] = currencies[i].drop(['Open','High','Low'], axis = 1)
-
-    currencies[i]['Date']= pd.to_datetime(currencies[i]['Date'], infer_datetime_format=True)
-
-    currencies[i] = currencies[i].set_index('Date')
-
-    # sample daily
-    currencies[i]= currencies[i].resample('D').mean()
-    
-for i in range(0,NC):
-    currencies[i] = currencies[i].rename(columns={'Close':str(List['Name'][i])})
-
-# merge
-currencies = pd.concat(currencies,axis=1)
-
-# Drop rows with nan values (since we have different starting dates in the CSV)
-currencies = currencies.dropna(axis = 0)
-
-# Get column names
-column_names = currencies.keys()
-
-for ii in range(0,len(column_names)):
-    for jj in range(ii+1,len(column_names)):
-        
-        # get the spread of two collumns
-        spread = find_spread_rolling(currencies, column_names[ii],column_names[jj])
-
 
 def rolling_ols(data1, data2, window =30):
     a = np.array([np.nan] * len(data1))
@@ -113,3 +76,79 @@ def find_spread_rolling(data, name1, name2):
     plt.title(name1+" "+name2+"scatter Zscore/beta")
     plt.ylabel('beta');
     plt.xlabel('Zscore');
+
+def find_cointegrated_pairs(data):
+    n = data.shape[1]
+    score_matrix = np.zeros((n, n))
+    pvalue_matrix = np.ones((n, n))
+    keys = data.keys()
+    pairs = []
+    for i in range(n):
+        for j in range(i+1, n):
+            S1 = data[keys[i]]
+            S2 = data[keys[j]]
+            result = coint(S1, S2)
+            score = result[0]
+            pvalue = result[1]
+            score_matrix[i, j] = score
+            pvalue_matrix[i, j] = pvalue
+            if pvalue < 0.05:
+                pairs.append((keys[i], keys[j]))
+    return score_matrix, pvalue_matrix, pairs
+
+
+
+
+if __name__ == "__main__":
+    NC=5
+
+    #Read the list of names 
+    List = pd.read_csv('../Top100Cryptos/100List.csv')
+    List = List.drop(['#','Market Cap', 'Price','Circulating Supply','Volume (24h)','% Change (24h)'], axis = 1)
+    currencies=[]
+    counter = 0
+    for i in range(0,NC):
+        tmp = pd.read_csv('../Top100Cryptos/'+str(List['Name'][i])+'.csv')
+        if len(tmp.index) > 100:
+            
+            print(str(List['Name'][i]))
+            tmp = tmp.drop(['Open','High','Low','Volume','Market Cap'], axis = 1)
+
+            tmp['Date']= pd.to_datetime(tmp['Date'], infer_datetime_format=True)
+
+            tmp = tmp.set_index('Date')
+
+            # sample daily
+            tmp= tmp.resample('D').mean()
+            currencies.append(tmp)
+            counter = counter + 1
+     
+    NC = counter   
+    for i in range(0,NC):
+        currencies[i] = currencies[i].rename(columns={'Close':str(List['Name'][i])})
+
+    # merge
+    currencies = pd.concat(currencies,axis=1)
+
+
+
+    # Drop rows with nan values (since we have different starting dates in the CSV)
+    currencies = currencies.dropna(axis = 0)
+
+    # Get column names
+    column_names = currencies.keys()
+
+    for ii in range(0,len(column_names)):
+        for jj in range(ii+1,len(column_names)):
+            
+            # get the spread of two collumns
+            spread = find_spread_rolling(currencies, column_names[ii],column_names[jj])
+
+    plt.show()
+
+    keys = currencies.keys()
+    scores, pvalues, pairs = find_cointegrated_pairs(currencies)
+    sns.heatmap(pvalues, xticklabels=keys, yticklabels=keys, cmap='RdYlGn_r', mask = (pvalues >= 0.05))
+    plt.show()
+    print (pairs)
+    print (pvalues)
