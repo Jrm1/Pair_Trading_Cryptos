@@ -81,7 +81,7 @@ def find_spread_rolling(data, name1, name2):
 
     # Get the 30 day moving average
 
-    spread_mavg30 = spread.rolling(window=60).mean()
+    spread_mavg30 = spread.rolling(window=90,win_type='hamming',center=False).mean()
 
     spread_mavg30.name = 'spread 30d mavg'
 
@@ -107,45 +107,45 @@ def find_spread_rolling(data, name1, name2):
 
     #plotting
 
-    plt.figure()
-
-    plt.plot(spread_mavg1.index, spread_mavg1.values)
-
-    plt.plot(spread_mavg30.index, spread_mavg30.values)
-
-    plt.legend(['1 Day Spread MAVG', '30 Day Spread MAVG'])
-
-    plt.title(name1+" "+name2)
-
-    plt.ylabel('Spread');
-
-    
-
-    
-
-    plt.figure()
-
-    zscore_30_1.plot()
-
-    plt.title(name1+" "+name2)
-
-    plt.axhline(0, color='black')
-
-    plt.axhline(1.0, color='red', linestyle='--');
-
-    plt.axhline(-1.0, color='green', linestyle='--');
-
-    
-
-    plt.figure()
-
-    plt.plot(zscore_30_1,b,'k.')
-
-    plt.title(name1+" "+name2+"scatter Zscore/beta")
-
-    plt.ylabel('beta');
-
-    plt.xlabel('Zscore');
+#    plt.figure()
+#
+#    plt.plot(spread_mavg1.index, spread_mavg1.values)
+#
+#    plt.plot(spread_mavg30.index, spread_mavg30.values)
+#
+#    plt.legend(['1 Day Spread MAVG', '30 Day Spread MAVG'])
+#
+#    plt.title(name1+" "+name2)
+#
+#    plt.ylabel('Spread');
+#
+#    
+#
+#    
+#
+#    plt.figure()
+#
+#    zscore_30_1.plot()
+#
+#    plt.title(name1+" "+name2)
+#
+#    plt.axhline(0, color='black')
+#
+#    plt.axhline(1.0, color='red', linestyle='--');
+#
+#    plt.axhline(-1.0, color='green', linestyle='--');
+#
+#    
+#
+#    plt.figure()
+#
+#    plt.plot(zscore_30_1,b,'k.')
+#
+#    plt.title(name1+" "+name2+"scatter Zscore/beta")
+#
+#    plt.ylabel('beta');
+#
+#    plt.xlabel('Zscore');
 
 
 
@@ -179,7 +179,7 @@ def find_cointegrated_pairs(data):
 
             pvalue_matrix[i, j] = pvalue
 
-            if pvalue < 0.05:
+            if pvalue < 0.00001:
 
                 pairs.append((keys[i], keys[j]))
 
@@ -195,7 +195,7 @@ def find_cointegrated_pairs(data):
 
 if __name__ == "__main__":
 
-    NC=5
+    NC=99
 
 
 
@@ -213,7 +213,7 @@ if __name__ == "__main__":
 
         tmp = pd.read_csv('../Top100Cryptos/'+str(List['Name'][i])+'.csv')
 
-        if len(tmp.index) > 100:
+        if len(tmp.index) > 1000:
 
             
 
@@ -275,26 +275,21 @@ if __name__ == "__main__":
 
         for jj in range(ii+1,len(column_names)):
 
-            
-
             # get the spread of two collumns
 
             spread = find_spread_rolling(currencies, column_names[ii],column_names[jj])
 
 
-
     plt.show()
-
-
 
     keys = currencies.keys()
 
     scores, pvalues, pairs = find_cointegrated_pairs(currencies)
 
-    sns.heatmap(pvalues, xticklabels=keys, yticklabels=keys, cmap='RdYlGn_r', mask = (pvalues >= 0.05))
+    sns.heatmap(pvalues, xticklabels=keys.tolist(), yticklabels=keys.tolist(), cmap='RdYlGn_r', mask = (pvalues >= 0.00001))
 
     plt.show()
 
     print (pairs)
 
-    print (pvalues)
+    #print (pvalues)
