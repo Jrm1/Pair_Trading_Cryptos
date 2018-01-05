@@ -154,10 +154,10 @@ def find_spread_rolling(data,window_ols,window_s):
 if __name__ == "__main__":
 
 
-    window_ols=120
+    window_ols=30
     window_s=90
-    coins=['Dash','Litecoin']
-    #coins=['PIVX','Vertcoin']
+    #coins=['Dash','Litecoin']
+    coins=['Ethereum','Litecoin']
 
 
     currencies=[]

@@ -18,7 +18,9 @@ import statsmodels.api as sm
 
 if __name__ == "__main__":
     
-    coins=['Dash','Litecoin']
+    #coins=['Dash','Litecoin']
+    coins=['PIVX','Vertcoin']
+
     
     Zscore=pd.read_csv('Z_'+str(coins[0])+'-'+str(coins[1])+'.csv')
     beta=pd.read_csv('b_'+str(coins[0])+'-'+str(coins[1])+'.csv')
@@ -58,30 +60,61 @@ if __name__ == "__main__":
     name2=keys[1]
     
     value=[0]
+    position1=[0]
+    position2=[0]
     for i in range(0,len(Zscore)):
-        if Zscore[i]>1:
-            value.append(-currencies[name2][i]+beta[i]*currencies[name1][i])
-        elif Zscore[i]<-1:
-            value.append(+currencies[name2][i]-beta[i]*currencies[name1][i])
+        if Zscore[i]>1.5:
+            value.append(-currencies[name2][len(currencies)-len(beta)+i]+beta[i]*currencies[name1][len(currencies)-len(beta)+i])
+            position1.append(-beta[i])
+            position2.append(1)
+        elif Zscore[i]<-1.5:
+            value.append(+currencies[name2][len(currencies)-len(beta)+i]-beta[i]*currencies[name1][len(currencies)-len(beta)+i])
+            position1.append(beta[i])
+            position2.append(-1)
+        elif -0.5<Zscore[i]<0.5:
+            value.append(-np.sum(position2)*currencies[name2][len(currencies)-len(beta)+i]-np.sum(position1)*currencies[name1][len(currencies)-len(beta)+i])
+            position1.append(-np.sum(position1))
+            position2.append(-np.sum(position2))
         else:
             value.append(0)
+            position1.append(0)
+            position2.append(0)
         
     
     plt.figure()
 
-    plt.plot(value)
+    plt.plot(position1)
+    plt.plot(position2)
+    plt.legend([str(name1), str(name2)])
+
 
     plt.title(name1+" "+name2+" trades")
 
-    plt.ylabel('instant P & L');
+    plt.ylabel('units bought and sold');
+    
+    
+    
+    plt.figure()
+
+    plt.plot(np.cumsum(position1))
+    plt.plot(np.cumsum(position2))
+    
+    plt.legend([str(name1), str(name2)])
+
+    plt.title(name1+" "+name2+" portfolio positions")
+
+    plt.ylabel('coins-holding (# of coins)');
+    
+    
     
     plt.figure()
 
     plt.plot(np.cumsum(value))
 
-    plt.title(name1+" "+name2+" trading")
+    plt.title(name1+" "+name2+" P&L")
 
     plt.ylabel('P & L');
+    
     
     
     plt.figure()
@@ -90,11 +123,23 @@ if __name__ == "__main__":
 
     plt.semilogy(currencies[name2].index[len(currencies)-len(beta):len(currencies)], -np.min(beta*currencies[name1].values[len(currencies)-len(beta):len(currencies)])+currencies[name2].values[len(currencies)-len(beta):len(currencies)])
 
-    plt.legend(['S1 rescaled', 'S2'])
+    plt.legend([str(name1)+' rescaled', str(name2)])
 
     plt.title(name1+" "+name2+" scaled prices")
 
-    plt.ylabel('Price S2');
+    plt.ylabel('$ (log-scale)');
+    
+    
+    plt.figure()
+    
+    plt.semilogy(currencies[str(name1)])
+    plt.semilogy(currencies[str(name2)])
+    
+    plt.legend([str(name1), str(name2)])
+
+    plt.title(name1+" "+name2)
+
+    plt.ylabel('$ (log-scale)');
     
     
     
@@ -109,5 +154,7 @@ if __name__ == "__main__":
     plt.axhline(1.0, color='red', linestyle='--');
 
     plt.axhline(-1.0, color='green', linestyle='--');
+    
+    
     
     plt.show()
