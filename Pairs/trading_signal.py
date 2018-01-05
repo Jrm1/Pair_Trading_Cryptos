@@ -11,21 +11,14 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-import datetime as dtm
-
-import statsmodels as st
-
 import statsmodels.api as sm
 
-from statsmodels.tsa.stattools import coint
-
+import csv
 
 
 
 
 def rolling_ols(data1, data2, window ):
-
-    a = np.array([np.nan] * len(data1))
 
     b = [np.nan] * len(data1)
 
@@ -102,6 +95,15 @@ def find_spread_rolling(data,window_ols,window_s):
     
 
     #plotting
+    
+    plt.figure()
+
+    plt.plot(spread_mavg1.index,b,'k-')
+
+    plt.title(name1+" "+name2+" beta")
+
+    plt.ylabel('beta');
+    
 
     plt.figure()
 
@@ -111,7 +113,7 @@ def find_spread_rolling(data,window_ols,window_s):
 
     plt.legend(['S1 rescaled', 'S2'])
 
-    plt.title(name1+" "+name2)
+    plt.title(name1+" "+name2+" scaled prices")
 
     plt.ylabel('Price S2');
     
@@ -125,7 +127,7 @@ def find_spread_rolling(data,window_ols,window_s):
 
     plt.legend(['1 Day Spread ', ' Spread MAVG'])
 
-    plt.title(name1+" "+name2)
+    plt.title(name1+" "+name2+" spread")
 
     plt.ylabel('Spread');
 
@@ -137,25 +139,15 @@ def find_spread_rolling(data,window_ols,window_s):
 
     Zscore.plot()
 
-    plt.title(name1+" "+name2)
+    plt.title(name1+" "+name2+" normalised spread")
 
     plt.axhline(0, color='black')
 
     plt.axhline(1.0, color='red', linestyle='--');
 
     plt.axhline(-1.0, color='green', linestyle='--');
-
     
-
-    plt.figure()
-
-    plt.plot(spread_mavg1.index,b,'k-')
-
-    plt.title(name1+" "+name2+"beta")
-
-    plt.ylabel('beta');
-
-    plt.xlabel('Zscore');
+    return Zscore, b
 
 
 
@@ -192,5 +184,9 @@ if __name__ == "__main__":
     currencies = pd.concat(currencies,axis=1)
     currencies = currencies.dropna(axis = 0)
 
-    spread = find_spread_rolling(currencies,window_ols,window_s)
+    Zscore, beta = find_spread_rolling(currencies,window_ols,window_s)
     plt.show()
+    
+    Zscore.to_csv('Z_'+str(coins[0])+'-'+str(coins[1])+'.csv')
+    beta = pd.DataFrame(beta, columns=["beta"])
+    beta.to_csv('b_'+str(coins[0])+'-'+str(coins[1])+'.csv', index=False)
