@@ -16,7 +16,7 @@ import statsmodels.api as sm
 import csv
 
 
-
+#this function computes the rolling linear relation between the two coins
 
 def rolling_ols(data1, data2, window ):
 
@@ -42,7 +42,7 @@ def rolling_ols(data1, data2, window ):
 
 
 
-
+#this function computes the normalised spread
 
 def find_spread_rolling(data,window_ols,window_s):
 
@@ -156,8 +156,8 @@ if __name__ == "__main__":
 
     window_ols=30
     window_s=90
-    #coins=['Dash','Litecoin']
-    coins=['Ethereum','Litecoin']
+    coins=['Dash','Litecoin']
+    #coins=['Ethereum','Litecoin']
 
 
     currencies=[]

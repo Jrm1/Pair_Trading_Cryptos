@@ -18,10 +18,11 @@ import statsmodels.api as sm
 
 if __name__ == "__main__":
     
-    #coins=['Dash','Litecoin']
-    coins=['PIVX','Vertcoin']
+    #select the pair to backtest
+    coins=['Dash','Litecoin']
+    #coins=['PIVX','Vertcoin']
 
-    
+    #upload .csv produced by trading_signal.py
     Zscore=pd.read_csv('Z_'+str(coins[0])+'-'+str(coins[1])+'.csv')
     beta=pd.read_csv('b_'+str(coins[0])+'-'+str(coins[1])+'.csv')
     
@@ -59,27 +60,29 @@ if __name__ == "__main__":
     name1=keys[0]
     name2=keys[1]
     
+    #backtest the trading strategy given by the if statements in 68 72 76-80
     value=[0]
     position1=[0]
     position2=[0]
     for i in range(0,len(Zscore)):
-        if Zscore[i]>1.5:
+        if Zscore[i]>1.5: #sell beta coins of first currency buy one coin of the second --> the spread will narrow
             value.append(-currencies[name2][len(currencies)-len(beta)+i]+beta[i]*currencies[name1][len(currencies)-len(beta)+i])
             position1.append(-beta[i])
             position2.append(1)
-        elif Zscore[i]<-1.5:
+        elif Zscore[i]<-1.5:#buy beta coins of first currency sell one coin of the second --> the spread will narrow
             value.append(+currencies[name2][len(currencies)-len(beta)+i]-beta[i]*currencies[name1][len(currencies)-len(beta)+i])
             position1.append(beta[i])
             position2.append(-1)
-        elif -0.5<Zscore[i]<0.5:
+        elif -0.5<Zscore[i]<0.5:#the spread is narrow-->close all positions (avoid currency 1 coins leftovers)
             value.append(-np.sum(position2)*currencies[name2][len(currencies)-len(beta)+i]-np.sum(position1)*currencies[name1][len(currencies)-len(beta)+i])
             position1.append(-np.sum(position1))
             position2.append(-np.sum(position2))
-        else:
+        else:#spread does not have a statistically significant value, wait.
             value.append(0)
             position1.append(0)
             position2.append(0)
         
+    #plotting
     
     plt.figure()
 
@@ -154,7 +157,6 @@ if __name__ == "__main__":
     plt.axhline(1.0, color='red', linestyle='--');
 
     plt.axhline(-1.0, color='green', linestyle='--');
-    
     
     
     plt.show()
