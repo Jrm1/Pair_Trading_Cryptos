@@ -154,10 +154,12 @@ def find_spread_rolling(data,window_ols,window_s):
 if __name__ == "__main__":
 
 
-    window_ols=30
-    window_s=90
+    window_ols=60
+    window_s=60
     coins=['Dash','Litecoin']
     #coins=['Ethereum','Litecoin']
+    #coins=['GameCredits','StellarLumens']
+
 
 
     currencies=[]
@@ -180,9 +182,13 @@ if __name__ == "__main__":
         
     for i in range(0,2):
         currencies[i] = currencies[i].rename(columns={'Close':str(coins[i])})
-    
+
     currencies = pd.concat(currencies,axis=1)
     currencies = currencies.dropna(axis = 0)
+    print(len(currencies))
+    currencies = currencies.drop(currencies.index[[range(900)]],axis = 0)
+    print(len(currencies))
+
 
     Zscore, beta = find_spread_rolling(currencies,window_ols,window_s)
     plt.show()

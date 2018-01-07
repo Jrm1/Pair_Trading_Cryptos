@@ -20,7 +20,9 @@ if __name__ == "__main__":
     
     #select the pair to backtest
     coins=['Dash','Litecoin']
-    #coins=['PIVX','Vertcoin']
+    #coins=['PIVX','Litecoin']
+    #coins=['GameCredits','StellarLumens']
+
 
     #upload .csv produced by trading_signal.py
     Zscore=pd.read_csv('Z_'+str(coins[0])+'-'+str(coins[1])+'.csv')
@@ -65,11 +67,11 @@ if __name__ == "__main__":
     position1=[0]
     position2=[0]
     for i in range(0,len(Zscore)):
-        if Zscore[i]>1.5: #sell beta coins of first currency buy one coin of the second --> the spread will narrow
+        if Zscore[i]<-1.5: #sell beta coins of first currency buy one coin of the second --> the spread will narrow
             value.append(-currencies[name2][len(currencies)-len(beta)+i]+beta[i]*currencies[name1][len(currencies)-len(beta)+i])
             position1.append(-beta[i])
             position2.append(1)
-        elif Zscore[i]<-1.5:#buy beta coins of first currency sell one coin of the second --> the spread will narrow
+        elif Zscore[i]>1.5:#buy beta coins of first currency sell one coin of the second --> the spread will narrow
             value.append(+currencies[name2][len(currencies)-len(beta)+i]-beta[i]*currencies[name1][len(currencies)-len(beta)+i])
             position1.append(beta[i])
             position2.append(-1)
@@ -122,9 +124,9 @@ if __name__ == "__main__":
     
     plt.figure()
 
-    plt.semilogy(currencies[name1].index[len(currencies)-len(beta):len(currencies)],-np.min(beta*currencies[name1].values[len(currencies)-len(beta):len(currencies)])+ beta*currencies[name1].values[len(currencies)-len(beta):len(currencies)])
+    plt.plot(currencies[name1].index[len(currencies)-len(beta):len(currencies)],-np.min(beta*currencies[name1].values[len(currencies)-len(beta):len(currencies)])+ beta*currencies[name1].values[len(currencies)-len(beta):len(currencies)])
 
-    plt.semilogy(currencies[name2].index[len(currencies)-len(beta):len(currencies)], -np.min(beta*currencies[name1].values[len(currencies)-len(beta):len(currencies)])+currencies[name2].values[len(currencies)-len(beta):len(currencies)])
+    plt.plot(currencies[name2].index[len(currencies)-len(beta):len(currencies)], -np.min(beta*currencies[name1].values[len(currencies)-len(beta):len(currencies)])+currencies[name2].values[len(currencies)-len(beta):len(currencies)])
 
     plt.legend([str(name1)+' rescaled', str(name2)])
 
