@@ -1,3 +1,11 @@
+# Updeting the code:
+
+Moved old code into a separate folder
+Refactored code is under work
+
+
+# Old_description
+
 trading_signal.py## Pair_Trading_Cryptos
 
 The spread.py code goes through the list of 100 cryptos and computes via rolling ols the normalised spread. Then it plots the spread and the beta coefficient that defines the spread. Finally it provides cointegration test for all pairs in the form of heatmap; small p values can be highlighted for convenience.
