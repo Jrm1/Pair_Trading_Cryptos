@@ -1,7 +1,10 @@
 
 
+import matplotlib.pyplot as plt
+import numpy as np
 
 class Plotter:
+
 
     def plot_zscore(Zscore, name1, name2):
 
@@ -11,7 +14,7 @@ class Plotter:
         plt.axhline(0, color='black')
         plt.axhline(1.0, color='red', linestyle='--');
         plt.axhline(-1.0, color='green', linestyle='--');
-        plt.show()
+
     
 
     def plot_currencies(currencies,name1,name2):
@@ -32,7 +35,7 @@ class Plotter:
         plt.ylabel('P & L');
 
 
-    def plot_logsc(currencies,beta, name1, name2):
+    def plot_logsc(currencies, beta, name1, name2):
 
         plt.figure()
         plt.plot(currencies[name1].index[len(currencies)-len(beta):len(currencies)],-np.min(beta*currencies[name1].values[len(currencies)-len(beta):len(currencies)])+ beta*currencies[name1].values[len(currencies)-len(beta):len(currencies)])
@@ -42,7 +45,7 @@ class Plotter:
         plt.ylabel('$ (log-scale)');
 
 
-    def plot_open_position(position1, name1, name2):
+    def plot_open_position(position1,position2, name1, name2):
 
         plt.figure()
         plt.plot(np.cumsum(position1))
@@ -52,7 +55,7 @@ class Plotter:
         plt.ylabel('coins-holding (# of coins)');
 
 
-    def units_bought_and_sold(position1, name1, name2):
+    def plot_units_bought_and_sold(position1, position2, name1, name2):
     
         plt.figure()
         plt.plot(position1)
