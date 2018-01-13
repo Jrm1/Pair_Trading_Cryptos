@@ -81,6 +81,8 @@
 In this paper we explore the idea of cointegration and its application to trading. We develop trading strategies for different currencies and provide back-tests that show the profit opportunities from implementing pair trading strategies on the cryptocurrency market.
 \end{abstract}
 
+\ab{we need to adapt description of the trading strategy to portfolio allocation framework, where we have a fix amount of money and we change the weights, i.e amount of money invested in each currency or left in bank account (assume 0\% interest rate).}
+
 \section{Introduction}
 
 \ab{work on introduction}
@@ -141,6 +143,8 @@ Once we have computed the coefficients $\boldsymbol{\beta}$ we can write explici
 \end{itemize}
 Note that $\beta$ needs not to be positive, hence we could have situations in which we buy or sell both underlying assets.
 
+\ab{Here I am saying that the mean of $Y$ is $b_0$, but in reality we compute it as $\frac{1}{T}\sum_{s=1}^T Y_s$ (this is true also in the rolling case) }
+
 \subsection{Rolling OLS estimation}
 Even though the approach presented in the previous section convinced the investor to put some money into this strategy, she can not find a pair of assets $(X_1,X_2)$ cointegrated over the last $T$ days ( we skip for now the formal presentation of the statistical tests for cointegration and carry over with a more intuitive presentation of our heuristic approach). Even though it is not rigorous to talk about two series being loosely or closely cointegrated, we could suppose that in the real world we find only assets with a low level of cointegration and therefore we are not able to build any stationary, mean-reverting process $Y$ using the technique just described. In order to overcome this difficulty we can employ a widespread heuristic approach, the rolling OLS estimation. It should be understood, however, that a careful implementation of this technique is necessary as it may lead to strategies which can not be implemented in practice.
 
@@ -148,7 +152,11 @@ A rolling estimation of the coefficients $\boldsymbol{\beta}$ allows to have muc
 
 The width of the window $W$ influences the sensitivity of $\beta$ to changes in the relation between the two underlying assets. A narrow window will be faster in detecting changes in the behaviour of the underlyings, but it will encode a lot of noise in the value of $\beta$; on the other hand wide windows will produce smoother maps $s\mapsto\beta_s$ which are more robust and, locally, justified by section \ref{sub:simple_OLS}.
 
+\ab{how can we justify rolling estimation of $\beta$? Shall we say that we choose $W$ such that $\{X^1_j\}$ and  $\{X^2_j\}$, $j\in[s-W,s]$ are cointegrated, $\forall s$? does this make sense?  }
+
 Notice that, heuristically, we would expect to find a qualitatively close resemblance between the graphs of $s\mapsto X^1_s$ and $s\mapsto \beta^0_s+\beta_s X^2_s$. We can further standardize, under the usual assumption of normality, the value of $Y$ by computing $Z_s=\frac{\hat{Y}_s}{\sigma_s}=\frac{Y_s-b^0_s}{\sigma_s}$. Under the standing assumption the random variable $Z_s\sim\mathcal{N}(0,1)$ allowing to devise standard trading strategies to be applied to many products built from pairs of underlying assets.
+
+\ab{Here I am saying that the mean of $Y$ is $b_0$, but in reality we compute it as $\frac{1}{W}\sum_{s=t}^{t+W} Y_s$. So why do I do that? would it be wrong to use $b_0$? }
 
 \subsection{Generalised index trading}
 \label{sec:index}
@@ -167,6 +175,15 @@ By following the well known OLS estimation technique for multivariate regression
 \subsection{Statistical tests}
  
 \ab{In this section we should explain the statistical test used to verify cointegration}
+
+see figure \ref{f:acf}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.5]{acf_comparison.jpeg}
+\caption{\ab{This type of picture can help}In the figure above we show the acf of two coins (black and blue) and superimposed the acf of the spread. It can be observed that the latter has ``better'' characteristics of the underlying coins.} 
+\label{f:acf}
+\end{figure}
 
 \section{Trading Cryptocurrencies}
 \label{sec:cryptos}
